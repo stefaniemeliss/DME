@@ -1,0 +1,197 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SWWS_XX FOLDER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clc;
+clear all;
+
+% define DME dir
+DME_dir='/storage/shared/research/cinn/2018/MAGMOT/DME';
+
+% add SPM dir
+spm_dir=[DME_dir '/spm12'];
+addpath(spm_dir);
+spm('defaults','fMRI');
+spm_jobman('initcfg');
+
+% define path where dicom files are stored
+preproc_dir=[DME_dir '/Preproc'];
+cd(preproc_dir);
+
+
+% to define the subject list dynamically, we use the subject folder list in
+% the preproc directory
+delete .* % delete all invisible files
+files = dir;
+files = files(~ismember({files.name},{'.','..', 'scripts'})); % delete current and parent directory strings and the scripts dir
+filenames = {files.name}; % from structure fils, only use the name
+subdirs = filenames([files.isdir]); %only use those file names that correspond to folders
+subjects = subdirs;
+
+%%%%%%%%%%%%%%%%% new folders and subfolders %%%%%%%%%%%%%%%%%
+
+base_dir = [DME_dir '/GLM/glm1/1st-level/'];
+
+con_dir = [BASE_DIR 'contrasts/'];
+mkdir(con_dir);
+
+
+num_name_contrast = {'con_0001' 'con_0002' 'con_0003' 'con_0004' 'con_0005' 'con_0006' 'con_0007' 'con_0008' 'con_0009' 'con_0010'...
+    'con_0011' 'con_0012' 'con_0013' 'con_0014' 'con_0015' 'con_0016'...
+    'con_0017' 'con_0018' 'con_0019' 'con_0020' 'con_0021' 'con_0022'...
+    'con_0023' 'con_0024' 'con_0025' 'con_0026' 'con_0027' 'con_0028'...
+    'con_0029' 'con_0030' 'con_0031' 'con_0032' 'con_0033' 'con_0034' 'con_0035' 'con_0036' 'con_0037'};
+
+name_contrast = {'SW_D' 'SW_M' 'SW_E' 'O_D_F' 'O_M_S' 'O_M_F' 'O_E_S' 'WS_D' 'WS_M' 'WS_E'...
+    'SWWS_D' 'SWWS_M' 'SWWS_E' ...
+    'SWWS_Donly' 'SWWS_Monly' 'SWWS_Eonly' ...
+    'SW_DM' 'SW_DE' 'SW_ME'...
+    'O_M_SF' 'O_S_ME' 'O_F_MD'...
+    'SWWS' 'SWWS_DM' 'SWWS_DE' 'SWWS_ME'...
+    'SW_quad' 'SWWS_quad' 'SWWS_quad_inv'...
+    'SWWS_DM_E' 'SWWS_ME_D' 'SW_DM_E' 'SW_ME_D' 'SW_pos' 'SW_neg' 'SWWS_pos' 'SWWS_neg'};
+
+
+
+%%%%%%%%%%%%%%%%% Copying and renaming files from subject to 'Contrasts' folder %%%%%%%%%%%%%%%%%
+
+
+
+for s = 1:length(subjects)
+    
+    
+    matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.dir = {[BASEDIR '/' subjects{s} '/']};
+    matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.filter = 'con.*';
+    matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.rec = 'FPList';
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.files(1) = cfg_dep('File Selector (Batch Mode): Selected Files (con.*)', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.copyren.copyto = {con_dir};
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.copyren.patrep.pattern = 'con';
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.copyren.patrep.repl = [subjects{s} '_con'];
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.copyren.unique = false;
+    
+    
+    spm_jobman('run',matlabbatch);
+    
+end
+
+%%%%%%%%%%%%%%%% Move files from 'Contrasts' folder to specific folder %%%%%%%%%%%%%%%%%
+
+
+for n = 1:length(num_name_contrast)
+    
+    
+    
+    matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.dir = {'/storage/shared/research/cinn/2018/MAGMOT/2017_DME/GLM/GLM1/Contrasts'};
+    matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.filter = ['.*' num_name_contrast{n}];
+    matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.rec = 'FPList';
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.files(1) = cfg_dep('File Selector (Batch Mode): Selected Files [.* num_name_contrast{n}]', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
+    matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.moveto = {[con_dir name_contrast{n} '/']};
+    
+    
+    spm_jobman('run',matlabbatch);
+    
+    
+end
+
+%%%%%%%%%%%%%%%% Group contrast files in control, reward, and gambling %%%%%%%%%%%%%%%%%
+
+
+control = {'KM13121601' 'KM13121701' 'KM13121704'...
+    'KM13121801' 'KM13121803' 'KM13121901'...
+    'KM13122001' 'KM13122002' 'KM13122004' 'KM14051202'...
+    'KM14051204' 'KM14051304' 'KM14051403'...
+    'KM14051404' 'KM14051503' 'KM14051504' 'KM14051601'};
+
+reward = {'KM13121602' 'KM13121604' 'KM13121702' 'KM13121703' 'KM13121802' 'KM13121804'...
+    'KM13121902' 'KM13121903' 'KM13122003' 'KM14051201' 'KM14051203' 'KM14051301'...
+    'KM14051302' 'KM14051401' 'KM14051402' 'KM14051501' 'KM14051502'};
+
+gambling = {'KM14090101' 'KM14090102' 'KM14090103' 'KM14090104' 'KM14090201' 'KM14090202' 'KM14090301'...
+    'KM14090302' 'KM14090303' 'KM14090304' 'KM14090401' 'KM14090402' 'KM14090403' 'KM14090501'...
+    'KM14090502' 'KM14090503' 'KM14090504'};
+
+
+
+for n = 1:length(name_contrast)
+    
+    % create directories for each group
+    cont_dir = [con_dir name_contrast{n} '/Control'];
+    mkdir(cont_dir);
+    reward_dir = [con_dir name_contrast{n} '/Reward'];
+    mkdir(reward_dir);
+    gambling_dir = [con_dir name_contrast{n} '/Gambling'];
+    mkdir(gambling_dir);
+    
+    
+    for s = 1:length(subjects)
+        
+        matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.dir = {[con_dir name_contrast{n}]};
+        matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.filter = ['^' subjects{s} '.*'];
+        matlabbatch{1}.cfg_basicio.file_dir.file_ops.file_fplist.rec = 'FPList';
+        matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.files(1) = cfg_dep('File Selector (Batch Mode): Selected Files [^ control{c}.*]', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
+        
+        % determine destination depending on group
+        if ismember(subjects{s}, control)
+            matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.moveto = {cont_dir};
+        elseif ismember(subjects{s}, reward)
+            matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.moveto = {reward_dir};
+        elseif ismember(subjects{s}, gambling)
+            matlabbatch{2}.cfg_basicio.file_dir.file_ops.file_move.action.moveto = {gambling_dir};
+        end
+        
+        % run batch
+        spm_jobman('run',matlabbatch);
+        
+    end
+    
+end
+
+for s = 1:length(subjects)
+    
+    % go into subject folder
+    sub_dir = [base_dir subjects{s}];
+    cd(sub_dir);
+    
+    % list all contrast files in there
+    cons = dir('con_*.nii');
+    contrast_files = {cons.name}; % from structure files, only use the name
+    
+    % loop over all contrast files
+    for n=1:length(contrast_files)
+        
+        thisFileName = contrast_files{f};
+        % Prepare the input filename.
+        inputFullFileName = fullfile(sub_dir, thisFileName);
+        % Prepare the new output filename.
+        outputBaseFileName = [subjects{s} '_' thisFileName];
+        
+        % create directories for each group
+        cont_dir = [con_dir name_contrast{n} '/Control'];
+        if ~exist(yourFolder, 'dir')
+            mkdir(cont_dir)
+        end
+        reward_dir = [con_dir name_contrast{n} '/Reward'];
+        if ~exist(reward_dir, 'dir')
+            mkdir(cont_dir)
+        end
+        gambling_dir = [con_dir name_contrast{n} '/Gambling'];
+        if ~exist(gambling_dir, 'dir')
+            mkdir(gambling_dir)
+        end
+        
+        % determine destination depending on group
+        if ismember(subjects{s}, control)
+            outputFolder  = cont_dir;
+        elseif ismember(subjects{s}, reward)
+            outputFolder = reward_dir;
+        elseif ismember(subjects{s}, gambling)
+            outputFolder = gambling_dir;
+        end
+        
+        outputFullFileName = fullfile(outputFolder, outputBaseFileName);
+        % Do the copying and renaming all at once.
+        copyfile(inputFullFileName, outputFullFileName);
+        
+    end
+    
+end
+
