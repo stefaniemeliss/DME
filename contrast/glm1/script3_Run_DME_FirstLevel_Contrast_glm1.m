@@ -22,7 +22,6 @@ files = files(~ismember({files.name},{'.','..', 'scripts'})); % delete current a
 filenames = {files.name}; % from structure fils, only use the name
 subdirs = filenames([files.isdir]); %only use those file names that correspond to folders
 subjects = subdirs;
-clear all;
 
 % define where to save the code
 save_dir = [DME_dir '/scripts/contrast/glm1/'];
