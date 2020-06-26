@@ -1,0 +1,37 @@
+#!/bin/bash
+
+### Configure Git ###
+# To start using Git from your computer, you’ll need to enter your credentials (user name and email) to identify you as the author of your work. The user name and email should match the ones you’re using on GitLab.
+
+git config --global user.name "stefaniemeliss"
+
+git config --global user.email "s_meliss@outlook.com"
+
+# To check the configuration, run:
+
+git config --global --list #The --global option tells Git to always use this information for anything you do on your system. If you omit --global or use --local, the configuration will be applied only to the current repository.
+
+
+
+### Basic Git commands ####
+#Start using Git via the command line with the most basic commands as described below.
+
+#Initialize a local directory for Git version control
+#If you have an existing local directory that you want to initialize for version control, use the init command to instruct Git to begin tracking the directory:
+cd /storage/shared/research/cinn/2018/MAGMOT/DME/scripts
+
+git init #This creates a .git directory that contains the Git configuration files.
+
+touch .gitignore # this creates gitignore file
+
+
+
+# specifiy origin
+git remote add origin https://github.com/stefaniemeliss/DME.git 
+
+git add . # adds all files in directory
+git commit -m "First commit" # commit with message -m
+git push origin master #pushes to master
+
+# to update the local copy with the version that is saved remotely, use git pull
+git pull https://github.com/stefaniemeliss/DME.git

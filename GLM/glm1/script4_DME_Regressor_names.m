@@ -52,4 +52,4 @@ end
 
 
  cd(save_dir);
- eval(['save script0_DME_names_regress_glm1.mat reg_names']);
+ eval(['save DME_names_regress_glm1.mat reg_names']);
