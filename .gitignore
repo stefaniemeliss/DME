@@ -13,3 +13,4 @@
 /group_anal/glm1/trend_effect_within_group/*WS*.mat
 /group_anal/beta_series_correlation/two_sample_t-test/DME_SecondLevel_BetaSeries_TwoSample_ttestSW*.mat
 /group_anal/parametric_modulation/*/t-test/DME_SecondLevel_pm_*_ttest_SW*.mat
+.Rproj.user

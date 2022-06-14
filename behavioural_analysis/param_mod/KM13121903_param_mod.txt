@@ -1,0 +1,12 @@
+"mot_low"	5
+"mot_mod"	6
+"mot_high"	2.66666666666667
+"val_low"	5
+"val_mod"	5
+"val_high"	7
+"mot_low_c"	0.444444444444443
+"mot_mod_c"	1.44444444444444
+"mot_high_c"	-1.88888888888889
+"val_low_c"	-0.666666666666667
+"val_mod_c"	-0.666666666666667
+"val_high_c"	1.33333333333333
