@@ -3,3 +3,9 @@
 /GLM/glm1/Regress_glm1/KM*
 /GLM/glm1/DME_FirstLevel_glm1_KM*
 /contrast/glm1/DME_FirstLevel_Contrast_glm1_KM*
+/group_anal/glm1/two_way_anova/*SW*.mat
+/group_anal/glm1/two_way_anova/*WS*.mat
+/group_anal/glm1/trend_effect_within_group/*SW*.mat
+/group_anal/glm1/trend_effect_within_group/*WS*.mat
+/group_anal/beta_series_correlation/two_sample_t-test/DME_SecondLevel_BetaSeries_TwoSample_ttestSW*.mat
+/group_anal/parametric_modulation/*/t-test/DME_SecondLevel_pm_*_ttest_SW*.mat
