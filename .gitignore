@@ -6,6 +6,7 @@
 /GLM/parametric_modulation/param_mod/KM*
 /GLM/parametric_modulation/*/DME_FirstLevel_pm_*_KM*.mat
 /contrast/glm1/DME_FirstLevel_Contrast_glm1_KM*
+/contrast/parametric_modulation/*/DME_FirstLevel_Contrast_pm_*_KM*.mat
 /group_anal/glm1/two_way_anova/*SW*.mat
 /group_anal/glm1/two_way_anova/*WS*.mat
 /group_anal/glm1/trend_effect_within_group/*SW*.mat
