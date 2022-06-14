@@ -2,6 +2,9 @@
 /preproc/DME_Preproc_KM*
 /GLM/glm1/Regress_glm1/KM*
 /GLM/glm1/DME_FirstLevel_glm1_KM*
+/GLM/parametric_modulation/pm_*/Regress_pm_*/KM*
+/GLM/parametric_modulation/param_mod/KM*
+/GLM/parametric_modulation/*/DME_FirstLevel_pm_*_KM*.mat
 /contrast/glm1/DME_FirstLevel_Contrast_glm1_KM*
 /group_anal/glm1/two_way_anova/*SW*.mat
 /group_anal/glm1/two_way_anova/*WS*.mat
