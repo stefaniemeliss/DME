@@ -1,7 +1,7 @@
 ---
 title: "Motivation for near-impossibility"
 author: "Stefanie Meliss"
-date: "13/06/2022"
+date: "21/09/2022"
 output: html_document
 ---
 
@@ -264,8 +264,8 @@ contrast(lsm_val_g, "poly") # look at polynomial contrasts
 varWithin <- "Chance of success" #fill
 levelWithinReordered <- c("High", "Moderate", "Extremely-low")
 groupNames <- c("No-reward", "Reward", "Gambling")
-title <- c("(A) Intrinsic motivation", "(B) Rewarding value", "(C) Activation pattern at (9 5 -8) and (-9 5 -8)")
-title <- c("(A) Intrinsic motivation", "(B) Rewarding value", "(C) Activation pattern at (10 6 -10) and (-8 6 -10)")
+title <- c("(A) Task enjoyment", "(B) Anticipated emotional value", "(C) Activation pattern at (9 5 -8) and (-9 5 -8)")
+title <- c("(A) Task enjoyment", "(B) Anticipated emotional value", "(C) Activation pattern at (10 6 -10) and (-8 6 -10)")
 xLab <- "Experimental group"
 yLab <- c("Rating", "Contrast estimate SW - WS")
 
@@ -331,6 +331,56 @@ outg_C <- outg_C + geom_bar(stat="identity", position="dodge") + geom_errorbar(a
   coord_cartesian(ylim = c(-1, 11)) + scale_fill_brewer(palette = 14)
 outg_C
 
+
+```
+
+```{r graphs2, echo=FALSE, fig.align = "center", out.width = '100%', fig.width = 25, fig.height=15}
+
+#################################################################################  
+########################### code to create SM Figures ########################### 
+#################################################################################  
+
+# define vector with coordinate details
+whole_brain_coords <- c("(20 -84 -28)", "(-16 -92 -18)", "(16 -90 -14)", 
+                        "(-2 -90 -10)", "(10 4 -10)", "(-8 6 -8)")
+
+yLab <- c("Contrast estimate SW - WS")
+
+# create figures in loop and save in list
+outg = list()
+
+for (i in 1:length(whole_brain_coords)) {
+  
+  # creating data frame for plotting purposes
+  peak <- describeBy(df[, c(paste0("PEAK", i, "_high"), paste0("PEAK", i, "_mod"), paste0("PEAK", i, "_low") )], group=df$cond)
+
+  graph_peak <- as.data.frame(rbind(peak$`No-reward`, peak$Reward, peak$Gambling))
+  graph_peak$cond <- rep(groupNames, each = 3)
+  
+  graph_peak$vars <- as.factor(graph_peak$vars)
+  levels(graph_peak$vars) <- levelWithinReordered
+  
+  # change title
+  title <- paste0("Activation pattern at ",whole_brain_coords[i])
+  title <- paste0("Peak at ",whole_brain_coords[i])
+  #title <- paste0(whole_brain_coords[i])
+  
+  
+  # plotting contrast estimates
+  outg[[i]] <- ggplot(graph_peak, aes(cond, mean, fill = vars))  + theme_classic()
+  outg[[i]] <- outg[[i]] + geom_bar(stat="identity", position="dodge") + geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1, position=position_dodge(0.9)) +
+    scale_x_discrete(limits=groupNames) + labs(x=xLab, y=yLab, fill = varWithin, title = title) +
+    theme(axis.text=element_text(size=axisSize), axis.title=element_text(size=axisSize, face="bold"), title=element_text(size = titleSize, face="bold"), legend.title = element_text(size=axisSize), legend.text = element_text(size = axisSize)) + 
+    coord_cartesian(ylim = c(-7, 17)) + scale_fill_brewer(palette = 14)
+  #print(outg[[i]])
+  
+}
+
+# combine all images
+ggpubr::ggarrange(outg[[1]],outg[[2]],outg[[3]],outg[[4]],outg[[5]],outg[[6]],
+                  #labels = c("A", "B", "C"),
+                  ncol = 3, nrow = 2, 
+                  common.legend = TRUE, legend="bottom")
 
 
 ```
