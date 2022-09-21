@@ -13,6 +13,7 @@ load_dir = [DME_dir '/scripts/group_anal/glm1/two_way_anova'];
 cd(load_dir);
 
 name_models = {'SWWS' 'SW' 'WS' 'SWWS_only'};
+name_models = {'SWWS'};
 
 
 

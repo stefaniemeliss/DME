@@ -14,3 +14,5 @@
 /group_anal/beta_series_correlation/two_sample_t-test/DME_SecondLevel_BetaSeries_TwoSample_ttestSW*.mat
 /group_anal/parametric_modulation/*/t-test/DME_SecondLevel_pm_*_ttest_SW*.mat
 .Rproj.user
+/group_anal/gPPI/two_sample_t-test/DME_SecondLevel_gPPI_TwoSample_ttest_*.mat
+/group_anal/glm1/t_tests/DME_SecondLevel_glm1_t_tests_SWWS_*.mat

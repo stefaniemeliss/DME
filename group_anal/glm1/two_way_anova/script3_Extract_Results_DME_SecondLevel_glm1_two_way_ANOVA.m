@@ -14,7 +14,7 @@ spm fmri
 load_dir = [DME_dir '/scripts/group_anal/glm1/two_way_anova'];
 
 name_models = {'SWWS' 'SW' 'WS' 'SWWS_only'};
-%name_models = {'SWWS'}; % debug
+name_models = {'SWWS'}; % debug
 
 contrast_list = {2 3 4 15 16};
 contrast_name = {'MainEffectGroup' 'MainEffectDifficulty' 'InteractionEffect' 'Trendeffect_1' 'Trendeffect_2'};
@@ -22,8 +22,8 @@ contrast_name = {'MainEffectGroup' 'MainEffectDifficulty' 'InteractionEffect' 'T
 %contrast_list = {4};  % debug
 %contrast_name = {'InteractionEffect'};  % debug
 
-analysis_type = {'wholeBrain' 'ROI'};
-analysis_out_name = {'wholeBrain_FWEc' 'ROI_FWEk'};
+analysis_type = {'wholeBrain' 'wholeBrain' 'ROI'};
+analysis_out_name = {'wholeBrain_FWEc' 'wholeBrain_FWEk' 'ROI_FWEk'};
 
 % determine ROI dir and file
 roi_dir=[DME_dir '/Masks'];
@@ -46,7 +46,7 @@ for t= 1:length(analysis_type)
             cd(load_dir);
             % 3. change other options depending on analysis_type
             if strcmp('ROI', analysis_type{t})
-                load DME_SecondLevel_ResultReport_ROI.mat 
+                load DME_SecondLevel_ResultReport_ROI.mat
             else
                 load DME_SecondLevel_ResultReport_wholeBrain.mat
             end
@@ -58,31 +58,36 @@ for t= 1:length(analysis_type)
             matlabbatch{1,1}.spm.stats.results.conspec.contrasts = current_contrast;
             matlabbatch{1}.spm.stats.results.export = cell(1, 0); % do not extract any results at this point
             
+            % determine thresholding method
+            if contains(analysis_out_name{t}, 'FWEk')
+                threshdesc = 'FWE';
+                thresh = 0.05;
+            else
+                threshdesc = 'none';
+                thresh = 0.001;
+            end
+            
+            % specify resulr thresholding
+            matlabbatch{1}.spm.stats.results.conspec.threshdesc = threshdesc; % adjust depending on ROI 'FWE' or whole brain analysis 'none'
+            matlabbatch{1}.spm.stats.results.conspec.thresh = thresh; % adjust depending on ROI 0.05 or whole brain analysis 0.001
+            matlabbatch{1}.spm.stats.results.conspec.extent = 0; % adjust depending on ROI [FWEc] or whole brain analysis [k]
+            matlabbatch{1}.spm.stats.results.conspec.conjunction = 1;
+            matlabbatch{1}.spm.stats.results.units = 1;
+            
             % 3. change other options depending on analysis_type
             if strcmp('ROI', analysis_type{t})
                 
-                % specification for ROI analysis
-                matlabbatch{1}.spm.stats.results.conspec.threshdesc = 'FWE'; % adjust depending on ROI 'FWE' or whole brain analysis 'none'
-                matlabbatch{1}.spm.stats.results.conspec.thresh = 0.05; % adjust depending on ROI 0.05 or whole brain analysis 0.001
-                matlabbatch{1}.spm.stats.results.conspec.extent = 0; % adjust depending on ROI [FWEc] or whole brain analysis [k]
-                matlabbatch{1}.spm.stats.results.conspec.conjunction = 1;
-                matlabbatch{1}.spm.stats.results.units = 1;
-                % specify mask
+                % specification for ROI analysis: specify mask
                 matlabbatch{1}.spm.stats.results.conspec.mask.image.name = {[roi_dir '/' roi_file]};
                 matlabbatch{1}.spm.stats.results.conspec.mask.image.mtype = 0; % inclusive
                 
             else
                 
                 % specification for whole brain analysis
-                matlabbatch{1}.spm.stats.results.conspec.threshdesc = 'none'; % adjust depending on ROI 'FWE' or whole brain analysis 'none'
-                matlabbatch{1}.spm.stats.results.conspec.thresh = 0.001; % adjust depending on ROI 0.05 or whole brain analysis 0.001
-                matlabbatch{1}.spm.stats.results.conspec.extent = 0; % adjust depending on ROI [FWEc] or whole brain analysis [k]
-                matlabbatch{1}.spm.stats.results.conspec.conjunction = 1;
-                matlabbatch{1}.spm.stats.results.units = 1;
                 matlabbatch{1}.spm.stats.results.conspec.mask.none = 1;
                 
             end
-                    
+            
             % 4. save changed temp file
             eval(['save DME_SecondLevel_ResultReport_temp.mat matlabbatch']);
             
@@ -91,14 +96,15 @@ for t= 1:length(analysis_type)
             spm_jobman('run', matlabbatch);
             
             % extract cluster extent depending in ROI or whole brain
-            if strcmp('wholeBrain', analysis_type{t})
+            if contains(analysis_out_name{t}, 'FWEc')
                 extent_val = TabDat.ftr{5,2}(3); % FWEc
             else
                 extent_val = TabDat.ftr{3,2}; % k
-            end  
+                extent_val = 5;
+            end
             
             extent_val = round(extent_val, 0)
-                        
+            
             % 6. load in temp file again
             cd(load_dir);
             load DME_SecondLevel_ResultReport_temp.mat
@@ -124,7 +130,7 @@ for t= 1:length(analysis_type)
             for K = 1 : length(oldnames)
                 this_name = oldnames{K};
                 new_name = strrep(this_name,'spm_', [contrast_name{c} '_' analysis_out_name{t} '_']);
-                movefile( fullfile(projectdir, this_name), fullfile(projectdir, new_name) );                
+                movefile( fullfile(projectdir, this_name), fullfile(projectdir, new_name) );
             end
             
             % 10. change name of pdf output files
@@ -135,7 +141,7 @@ for t= 1:length(analysis_type)
             for K = 1 : length(oldnames)
                 this_name = oldnames{K};
                 new_name = strrep(this_name,'spm_', [contrast_name{c} '_' analysis_out_name{t} '_']);
-                movefile( fullfile(projectdir, this_name), fullfile(projectdir, new_name) );                
+                movefile( fullfile(projectdir, this_name), fullfile(projectdir, new_name) );
             end
             
             

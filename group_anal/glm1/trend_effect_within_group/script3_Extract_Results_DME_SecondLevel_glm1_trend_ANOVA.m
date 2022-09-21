@@ -28,6 +28,7 @@ group = {'control' 'reward' 'gambling'};
 
 analysis_type = {'wholeBrain' 'ROI'};
 analysis_out_name = {'wholeBrain_FWEc' 'ROI_FWEk'};
+analysis_out_name = {'wholeBrain_FWEc' 'ROI_FWE0'};
 
 % determine ROI dir and file
 roi_dir=[DME_dir '/Masks'];
@@ -104,6 +105,7 @@ for g = 1:length(group)
                     extent_val = TabDat.ftr{5,2}(3); % FWEc
                 else
                     extent_val = TabDat.ftr{3,2}; % k
+                    extent_val = 0;
                 end
                 
                 extent_val = round(extent_val, 0)
